@@ -1,0 +1,11 @@
+# Core (offline run): histograms + numerics
+matplotlib>=3.8
+numpy>=1.26
+pandas>=2.0
+scipy>=1.11
+# Real-time demo app (streamlit run streamlit_app.py)
+streamlit>=1.40
+# Live API backends (optional)
+anthropic>=1.0        # Claude Haiku / Sonnet backends
+google-genai>=1.0     # Gemini Flash-Lite backend
+python-dotenv>=1.0    # loads GEMINI_API_KEY from cred.env

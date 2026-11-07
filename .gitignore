@@ -1,0 +1,6 @@
+cred.env
+*.env
+.env
+__pycache__/
+*.pyc
+data/external/normalized_dataset_full.parquet
