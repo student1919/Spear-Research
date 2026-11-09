@@ -4,8 +4,8 @@ _Computed by `scripts/make_calibration_report.py` from `data/v1/*.jsonl`. Findin
 
 ## 1. How they were produced
 
-- `report/REPORT.md` records `backend: LocalBackend`. The 100 profiles and 100 emails were **composed offline from fixed template pools** (`src/pools.py`), not written by an LLM. The `claude-sonnet-5-5` / `claude-haiku-5-5` labels in the report header are configuration metadata; the 5 'seed' items were also template-composed.
-- Every sampling weight in `config/dimensions.py` is a hand-set number with an inline rationale (for example Finance 0.26, Tech 0.24, Healthcare 0.20, Government 0.16, Education 0.14). None is sourced.
+- The v1 run report (`report/REPORT.md`, removed with the v1 code; see git history) recorded `backend: LocalBackend`. The 100 profiles and 100 emails were **composed offline from fixed template pools** (`src/pools.py`), not written by an LLM. The `claude-sonnet-5-5` / `claude-haiku-5-5` labels in the report header are configuration metadata; the 5 'seed' items were also template-composed.
+- Every sampling weight in the v1 `config/dimensions.py` (removed; see git history) was a hand-set number with an inline rationale (for example Finance 0.26, Tech 0.24, Healthcare 0.20, Government 0.16, Education 0.14). None was sourced.
 
 ## 2. Distribution vs government data
 

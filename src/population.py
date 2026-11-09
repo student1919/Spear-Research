@@ -79,8 +79,15 @@ def _weighted_choice(rng: random.Random, items, weights):
 
 
 class Population:
-    def __init__(self, seed: int = 7, ref_dir: Path | None = None):
+    def __init__(self, seed: int = 7, ref_dir: Path | None = None,
+                 single_org: tuple[str, str] | None = None, headcount: int | None = None):
+        """`single_org=(industry, size_class)` puts every sampled person at ONE company of that
+        industry and size class (the role, age, sex, education... draws then condition on that
+        industry). `headcount` pins the company's size (default: drawn from the class bounds)."""
         self.rng = random.Random(seed)
+        self.single_org = single_org
+        self._fixed_headcount = headcount
+        self._fixed_org: dict[str, Any] | None = None
         self.nprng = np.random.default_rng(seed)
         ref = Path(ref_dir) if ref_dir else REF
         self._load_reference(ref)
@@ -157,7 +164,7 @@ class Population:
         self._org_names.add(name)
         slug = name.lower().replace(" ", "").replace(",", "")
         lo, hi = E.SIZE_CLASS_BOUNDS[size_class]
-        headcount = int(round(math.exp(r.uniform(math.log(lo), math.log(hi)))))
+        headcount = self._fixed_headcount or int(round(math.exp(r.uniform(math.log(lo), math.log(hi)))))
         org = {
             "org_id": f"org_{len(self.orgs):04d}",
             "name": name,
@@ -404,9 +411,15 @@ class Population:
     # ------------------------------------------------------------- one person
     def sample_person(self) -> dict[str, Any]:
         r = self.rng
-        industry = _weighted_choice(r, E.INDUSTRIES, self.industry_w)
-        size_class = _weighted_choice(r, E.SIZE_CLASSES, [E.SUSB_EMPLOYMENT[industry][c] for c in E.SIZE_CLASSES])
-        org = self._pick_org(industry, size_class)
+        if self.single_org:
+            industry, size_class = self.single_org
+            if self._fixed_org is None:
+                self._fixed_org = self._make_org(industry, size_class)
+            org = self._fixed_org
+        else:
+            industry = _weighted_choice(r, E.INDUSTRIES, self.industry_w)
+            size_class = _weighted_choice(r, E.SIZE_CLASSES, [E.SUSB_EMPLOYMENT[industry][c] for c in E.SIZE_CLASSES])
+            org = self._pick_org(industry, size_class)
         role = _weighted_choice(r, E.TARGET_ROLES, self.role_w[industry])
         age = self._age(industry, role)
         birth_year = CURRENT_YEAR - age

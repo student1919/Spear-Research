@@ -1,21 +1,21 @@
-"""Real-time demo of synthetic profile generation.
+"""Real-time demo of synthetic profile generation (v2 pipeline).
 
     streamlit run streamlit_app.py
 
-Each "Generate" click produces a fresh synthetic profile live by calling the same
-pipeline the batch run uses (src/sample.py + src/llm.py backends + src/prompts.py).
-Local backend runs offline and instantly; the Anthropic backend calls Haiku/Sonnet
-live when the SDK + credentials are present. Everything is fictional and uses only
-reserved .example domains.
+Each "Generate" click samples one person from the calibrated population
+(src/population.py), has the selected backend write the narrative (src/profile_v2.py,
+same validation and retries as the batch run) and optionally the targeting spear email
+(src/emails_v2.py). The Local backend runs offline and instantly; the live backends make
+real API calls. Everything is fictional and uses only reserved .example domains.
 """
 
 from __future__ import annotations
 
-import os
-import sys
 import json
 import random
+import sys
 import time
+from dataclasses import asdict
 from pathlib import Path
 
 import streamlit as st
@@ -23,21 +23,22 @@ import streamlit as st
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-from config import dimensions as D                      # noqa: E402
-from src.llm import (                                   # noqa: E402
-    LocalBackend, AnthropicBackend, LiveHaikuBackend, GeminiBackend,
-    SEED_MODEL, BULK_MODEL, GEMINI_PRIMARY,
-)
-from src.sample import make_org, _coherent_role, _coherent_stage           # noqa: E402
+from config import empirical as E                                          # noqa: E402
+from src.analyze import CAREER_STAGES                                      # noqa: E402
+from src.emails_v2 import generate_emails_v2, profile_dict                 # noqa: E402
+from src.llm import (AnthropicBackend, GeminiBackend, LiveHaikuBackend,    # noqa: E402
+                     LocalBackend, GEMINI_PRIMARY, BULK_MODEL, SEED_MODEL)
+from src.population import Population                                      # noqa: E402
+from src.profile_v2 import generate_profiles_v2                            # noqa: E402
 
 RANDOM = "— random —"
+MAX_DRAWS = 5000   # rejection-sampling budget when dimensions are pinned
 
 LOCAL_OPT = "Local (offline, instant)"
-HAIKU_OPT = "Live API — Claude Haiku (true call)"
-GEMINI_OPT = "Live API — Gemini Flash-Lite (true call)"
-TWOPASS_OPT = "Anthropic — Sonnet seed + Haiku bulk (SDK)"
-
-ANTHROPIC_OPTS = {HAIKU_OPT, TWOPASS_OPT}
+HAIKU_OPT = f"Live API — Claude Haiku ({BULK_MODEL})"
+GEMINI_OPT = f"Live API — Gemini Flash-Lite ({GEMINI_PRIMARY})"
+SONNET_OPT = f"Live API — Claude Sonnet ({SEED_MODEL})"
+ANTHROPIC_OPTS = {HAIKU_OPT, SONNET_OPT}
 
 st.set_page_config(page_title="Synthetic Profile Generator", page_icon="🪪", layout="wide")
 
@@ -50,27 +51,13 @@ def _installed(mod: str) -> bool:
         return False
 
 
-def anthropic_installed() -> bool:
-    return _installed("anthropic")
-
-
-def genai_installed() -> bool:
-    return _installed("google.genai")
-
-
 @st.cache_resource(show_spinner=False)
-def get_anthropic_backend():
+def get_live_backend(choice: str):
+    if choice == HAIKU_OPT:
+        return LiveHaikuBackend()
+    if choice == GEMINI_OPT:
+        return GeminiBackend()
     return AnthropicBackend()
-
-
-@st.cache_resource(show_spinner=False)
-def get_haiku_backend():
-    return LiveHaikuBackend()
-
-
-@st.cache_resource(show_spinner=False)
-def get_gemini_backend():
-    return GeminiBackend()
 
 
 # --- sidebar controls -------------------------------------------------------
@@ -78,26 +65,22 @@ def get_gemini_backend():
 st.sidebar.header("Generation controls")
 
 backend_choice = st.sidebar.radio(
-    "Backend",
-    [LOCAL_OPT, HAIKU_OPT, GEMINI_OPT, TWOPASS_OPT],
-    index=0,
-    help="Local composes offline from Claude-authored pools. "
-         "'Claude Haiku' makes one real `claude-haiku-5-5` call per generation. "
-         "'Gemini Flash-Lite' makes one real Gemini call (3.5-flash-lite, falling back "
-         "to 3.1-flash-lite). 'Sonnet seed + Haiku bulk' is the two-pass batch design.",
+    "Backend", [LOCAL_OPT, HAIKU_OPT, GEMINI_OPT, SONNET_OPT], index=0,
+    help="Local composes offline from src/pools.py (not model text). The live options make one real "
+         "call per narrative/email, plus retries when the output fails validation.",
 )
-if backend_choice in ANTHROPIC_OPTS and not anthropic_installed():
+if backend_choice in ANTHROPIC_OPTS and not _installed("anthropic"):
     st.sidebar.warning("`anthropic` SDK not installed — `pip install anthropic`, then set "
                        "`ANTHROPIC_API_KEY` (or run `ant auth login`).")
-if backend_choice == GEMINI_OPT and not genai_installed():
+if backend_choice == GEMINI_OPT and not _installed("google.genai"):
     st.sidebar.warning("`google-genai` not installed — `pip install google-genai`. "
                        "`GEMINI_API_KEY` is loaded from `cred.env`.")
 
-st.sidebar.markdown("**Target dimensions** — pick or leave random")
-industry = st.sidebar.selectbox("Industry", [RANDOM] + D.INDUSTRIES)
-stage = st.sidebar.selectbox("Career stage", [RANDOM] + D.CAREER_STAGES)
-size = st.sidebar.selectbox("Company size", [RANDOM] + D.COMPANY_SIZES)
-role = st.sidebar.selectbox("Target role", [RANDOM] + D.TARGET_ROLES)
+st.sidebar.markdown("**Pin dimensions** — or leave random (calibrated distribution)")
+industry = st.sidebar.selectbox("Industry", [RANDOM] + E.INDUSTRIES)
+size_class = st.sidebar.selectbox("Employer size (employees)", [RANDOM] + E.SIZE_CLASSES)
+role = st.sidebar.selectbox("Target role", [RANDOM] + E.TARGET_ROLES)
+stage = st.sidebar.selectbox("Career stage", [RANDOM] + CAREER_STAGES)
 
 st.sidebar.markdown("---")
 lock_seed = st.sidebar.checkbox("Lock seed (reproducible)", value=False)
@@ -109,53 +92,47 @@ generate = st.sidebar.button("⚡ Generate profile", type="primary", use_contain
 
 # --- generation -------------------------------------------------------------
 
-def resolve_dims(rng: random.Random) -> dict:
-    ind = rng.choices(list(D.INDUSTRY_WEIGHTS), weights=list(D.INDUSTRY_WEIGHTS.values()))[0] \
-        if industry == RANDOM else industry
-    sz = rng.choices(list(D.COMPANY_SIZE_WEIGHTS), weights=list(D.COMPANY_SIZE_WEIGHTS.values()))[0] \
-        if size == RANDOM else size
-    rl = _coherent_role(rng, ind) if role == RANDOM else role
-    stg = _coherent_stage(rng, rl) if stage == RANDOM else stage
-    return {"industry": ind, "company_size": sz, "target_role": rl, "career_stage": stg}
+def _matches(spec: dict) -> bool:
+    want = {"industry": industry, "size_class": size_class, "target_role": role, "career_stage": stage}
+    return all(v == RANDOM or spec[k] == v for k, v in want.items())
+
+
+def sample_spec(seed: int) -> tuple[dict, dict]:
+    """Draw from the calibrated population until the pinned dimensions match."""
+    pop = Population(seed=seed)
+    for _ in range(MAX_DRAWS):
+        spec = pop.sample_person()
+        if _matches(spec):
+            org = next(o for o in pop.orgs if o["org_id"] == spec["org_id"])
+            return spec, org
+    raise RuntimeError(f"No sampled person matched the pinned dimensions in {MAX_DRAWS:,} draws; "
+                       "that combination is rare or absent in the calibrated population.")
 
 
 def run_generation():
-    rng = random.Random(int(seed_val)) if lock_seed else random.Random()
+    seed = int(seed_val) if lock_seed else random.randrange(1_000_000)
     is_local = backend_choice == LOCAL_OPT
+    backend = LocalBackend(random.Random(seed)) if is_local else get_live_backend(backend_choice)
+    label = "LocalBackend" if is_local else backend_choice.split("(")[-1].rstrip(")") + " (live)"
+    usage, notes = [], []
 
     with st.status("Generating…", expanded=True) as status:
-        status.write("Sampling target dimensions")
-        dims = resolve_dims(rng)
-        status.write(f"Building synthetic company ({dims['industry']}, {dims['company_size']})")
-        org = make_org(rng, dims["industry"], dims["company_size"])
-        spec = {**dims, "org_id": org["org_id"]}
-
-        if is_local:
-            backend, fewshot, model, label = LocalBackend(rng), [], None, "LocalBackend"
-        else:
-            from src.prompts import profile_fewshot_messages
-            fewshot, model = profile_fewshot_messages(3), BULK_MODEL
-            if backend_choice == HAIKU_OPT:
-                backend, label = get_haiku_backend(), "claude-haiku-5-5 (live)"
-            elif backend_choice == GEMINI_OPT:
-                backend, label = get_gemini_backend(), f"{GEMINI_PRIMARY} (live)"
-            else:
-                backend, label = get_anthropic_backend(), "Sonnet-seed / Haiku-bulk (live)"
-
-        status.write(f"Prompting {label}")
+        status.write("Sampling a person from the calibrated population")
+        spec, org = sample_spec(seed)
+        status.write(f"Writing the narrative with {label}")
         t0 = time.perf_counter()
-        profile = backend.realize_profile(spec, org, model=model, fewshot=fewshot)
-        usage = [{"stage": "profile", **(getattr(backend, "last_usage", None) or {})}] \
-            if getattr(backend, "last_usage", None) else []
+        bundles, issues = generate_profiles_v2(backend, [org], [spec], random.Random(seed + 1),
+                                               log=notes.append)
+        if not bundles:
+            raise RuntimeError("The backend returned no parseable profile: " + "; ".join(notes))
+        if getattr(backend, "last_usage", None):
+            usage.append({"stage": "profile", **backend.last_usage})
 
-        email = None
+        email, email_issues = None, []
         if also_email:
-            status.write("Prompting for the targeting spear email")
-            efew = []
-            if not is_local:
-                from src.prompts import email_fewshot_messages
-                efew = email_fewshot_messages(3)
-            email = backend.realize_email(profile, org, model=model, fewshot=efew)
+            status.write("Writing the targeting spear email")
+            emails, email_issues = generate_emails_v2(backend, bundles, [org], log=notes.append)
+            email = asdict(emails[0]) if emails else None
             if getattr(backend, "last_usage", None):
                 usage.append({"stage": "email", **backend.last_usage})
 
@@ -163,8 +140,9 @@ def run_generation():
         status.update(label=f"Done in {elapsed:,.0f} ms", state="complete", expanded=False)
 
     st.session_state["result"] = {
-        "org": org, "spec": spec, "profile": profile, "email": email,
-        "backend": label, "ms": round(elapsed), "usage": usage,
+        "org": org, "spec": spec, "profile": profile_dict(bundles[0]), "email": email,
+        "issues": [e for i in issues for e in i["errors"]] + [e for i in email_issues for e in i["errors"]],
+        "backend": label, "seed": seed, "ms": round(elapsed), "usage": usage,
     }
 
 
@@ -191,7 +169,7 @@ if generate:
 
 st.title("🪪 Synthetic Profile Generator")
 st.caption("Live demo of the spear-phishing **detector-research** profile generator "
-           "(`Profiles.md`). Pick dimensions, click **Generate**.")
+           "(v2: calibrated sampler + model-written narrative). Pin dimensions, click **Generate**.")
 st.info("All people, companies, and addresses are **fictional** and use reserved "
         "`.example` domains. Nothing here describes or targets a real person.", icon="🛡️")
 
@@ -202,31 +180,30 @@ def kv(label, value):
 
 def render(result: dict):
     org, profile, email = result["org"], result["profile"], result["email"]
-    core = profile["core"]
+    core, pub, pri, beh = profile["core"], profile["public"], profile["private"], profile["behavior"]
 
-    st.success(f"Generated via **{result['backend']}** in {result['ms']:,} ms", icon="✅")
+    st.success(f"Generated via **{result['backend']}** in {result['ms']:,} ms (seed {result['seed']})", icon="✅")
     usage = result.get("usage") or []
     if usage:
         tin = sum((u.get("input_tokens") or 0) for u in usage)
         tout = sum((u.get("output_tokens") or 0) for u in usage)
-        model_id = usage[0].get("model", "")
-        st.caption(f"🔌 Live call to `{model_id}` — {tin:,} input / {tout:,} output tokens "
-                   f"across {len(usage)} prompt(s).")
+        st.caption(f"🔌 Live call to `{usage[0].get('model', '')}` — {tin:,} input / {tout:,} output tokens "
+                   f"(last call of each stage).")
+    if result.get("issues"):
+        st.warning("Kept after retries with validation issues: " + "; ".join(result["issues"]))
 
-    # Company
     with st.container(border=True):
         st.subheader(f"🏢 {org['name']}")
         c = st.columns(5)
         c[0].metric("Industry", org["industry"])
-        c[1].metric("Size", org["size"])
+        c[1].metric("Size class", org["size_class"])
         c[2].metric("Headcount", f"{org['headcount']:,}")
         c[3].metric("HQ", org["hq_city"])
         c[4].metric("Domain", org["domain"])
 
-    # Identity
     with st.container(border=True):
         st.subheader(f"👤 {core['full_name']} — {core['title']}")
-        c = st.columns(4)
+        c = st.columns(5)
         with c[0]:
             kv("Email", f"`{core['email']}`")
         with c[1]:
@@ -234,18 +211,30 @@ def render(result: dict):
         with c[2]:
             kv("Target role", core["target_role"])
         with c[3]:
-            kv("Location", core["location"])
+            kv("Age / tenure", f"{core['age']} / {core['tenure_years']} y")
+        with c[4]:
+            kv("Education", core["highest_education"])
 
-    # Detail tabs
-    tabs = st.tabs(["🌐 Public footprint", "🔒 Private (ground truth)",
-                    "🧠 Behavior", "🧾 Raw JSON"])
-    pub, pri, beh = profile["public"], profile["private"], profile["behavior"]
+    tabs = st.tabs(["📄 Résumé", "🌐 Public footprint", "🔒 Private (ground truth)", "🧠 Behavior", "🧾 Raw JSON"])
+    res = pub.get("resume") or {}
 
     with tabs[0]:
-        st.markdown(f"**Footprint level:** {pub.get('footprint_level')}")
-        st.markdown("**Résumé bullets**")
-        for b in pub.get("resume_bullets", []):
+        st.caption(f"{pub.get('resume_word_count', 0)} words across {len(pub.get('resume_bullets', []))} bullets")
+        cur = res.get("current_job") or {}
+        st.markdown(f"**{cur.get('title', core['title'])}** — {org['name']} (current)")
+        for b in cur.get("bullets", []):
             st.markdown(f"- {b}")
+        for job in res.get("prior_jobs", []):
+            st.markdown(f"**{job.get('title')}** — {job.get('employer')} ({job.get('start_year')}–{job.get('end_year')})")
+            for b in job.get("bullets", []):
+                st.markdown(f"- {b}")
+        if res.get("education"):
+            st.markdown("**Education**")
+            for b in res["education"]:
+                st.markdown(f"- {b}")
+
+    with tabs[1]:
+        st.markdown(f"**Footprint level:** {pub.get('footprint_level')} (score {pub.get('footprint_score')})")
         cols = st.columns(2)
         with cols[0]:
             st.markdown("**Social presence**")
@@ -255,9 +244,9 @@ def render(result: dict):
         with cols[1]:
             st.markdown("**Posts**")
             for p in pub.get("posts", []):
-                st.markdown(f"- *{p.get('date')}* — {p.get('text')}")
+                st.markdown(f"- *{p.get('date')} · {p.get('platform')}* — {p.get('text')}")
 
-    with tabs[1]:
+    with tabs[2]:
         st.caption("The ground truth the public footprint only hints at — the baseline for "
                    "under-knowledge comparison.")
         st.markdown("**Projects:** " + ", ".join(pri.get("projects", [])))
@@ -271,18 +260,19 @@ def render(result: dict):
         for d in pri.get("real_details", []):
             st.markdown(f"- {d}")
 
-    with tabs[2]:
-        c = st.columns(2)
+    with tabs[3]:
+        c = st.columns(4)
         c[0].metric("Security awareness", beh.get("security_awareness"))
         c[1].metric("Busy level", beh.get("busy_level"))
+        c[2].metric("p(click simulated phish)", beh.get("p_click_simulated_phish"))
+        c[3].metric("Emails / day", beh.get("emails_received_per_day"))
         st.markdown("**Traits:** " + ", ".join(beh.get("traits", [])))
         st.markdown("**Response tendencies**")
         st.json(beh.get("response_tendencies", {}))
 
-    with tabs[3]:
-        st.json(profile)
+    with tabs[4]:
+        st.json({"spec": result["spec"], **profile})
 
-    # Download
     st.download_button(
         "⬇️ Download profile JSON",
         json.dumps({"org": org, **profile}, ensure_ascii=False, indent=2),
@@ -290,7 +280,6 @@ def render(result: dict):
         mime="application/json",
     )
 
-    # Optional email
     if email:
         st.markdown("---")
         st.subheader("✉️ Targeting spear email")
@@ -303,11 +292,10 @@ def render(result: dict):
         st.markdown(f"**From:** `{email['sender_display']} <{email['sender_address']}>`")
         st.markdown(f"**Subject:** {email['subject']}")
         st.code(email["body"], language="text")
-        st.caption("Personalization used: " + ", ".join(email.get("personalization_fields", [])))
+        st.caption("Personalization used: " + ", ".join(map(str, email.get("personalization_fields", []))))
 
 
 if "result" in st.session_state:
     render(st.session_state["result"])
 else:
-    st.markdown("> Set your dimensions in the sidebar and press **⚡ Generate profile**. "
-                "Leave fields on *— random —* to sample the weighted target distribution.")
+    st.markdown("> Pin dimensions in the sidebar (or leave them random) and press **⚡ Generate profile**.")

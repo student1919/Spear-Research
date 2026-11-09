@@ -173,11 +173,11 @@ A: list[str] = []
 A.append("# Audit of the original 100 profiles (v1)\n")
 A.append("_Computed by `scripts/make_calibration_report.py` from `data/v1/*.jsonl`. Findings only._\n")
 A.append("## 1. How they were produced\n")
-A.append("- `report/REPORT.md` records `backend: LocalBackend`. The 100 profiles and 100 emails were **composed offline from fixed "
+A.append("- The v1 run report (`report/REPORT.md`, removed with the v1 code; see git history) recorded `backend: LocalBackend`. The 100 profiles and 100 emails were **composed offline from fixed "
          "template pools** (`src/pools.py`), not written by an LLM. The `claude-sonnet-5-5` / `claude-haiku-5-5` labels in the "
          "report header are configuration metadata; the 5 'seed' items were also template-composed.\n"
-         "- Every sampling weight in `config/dimensions.py` is a hand-set number with an inline rationale (for example "
-         "Finance 0.26, Tech 0.24, Healthcare 0.20, Government 0.16, Education 0.14). None is sourced.\n")
+         "- Every sampling weight in the v1 `config/dimensions.py` (removed; see git history) was a hand-set number with an inline rationale (for example "
+         "Finance 0.26, Tech 0.24, Healthcare 0.20, Government 0.16, Education 0.14). None was sourced.\n")
 A.append("## 2. Distribution vs government data\n")
 A.append("| Quantity | v1 | target | TV distance | chi-square p |\n|---|---|---|---|---|")
 ind_obs = share(v1_ind, E.INDUSTRIES, n1)
@@ -282,8 +282,9 @@ C.append("- The sampler in `src/population.py` now draws every profile's industr
          "tenure, career stage, online-platform use, email workload and phishing susceptibility from distributions in "
          "`config/empirical.py`. Each parameter names a source in `config/sources.py` and an evidence grade "
          "(data / derived / proxy / assumption; Section 6).")
-C.append("- The LLM no longer chooses any number. It receives the sampled person and writes only text (resume bullets, post text, "
-         "projects, ground-truth details, traits). Colleague names and prior employers are also sampled in code, because the live "
+C.append("- The LLM chooses none of the sampled quantities. It receives the sampled person and writes only text (resume, post text, "
+         "projects, ground-truth details, traits). Since prompt v2.1 the resume is 450-550 words and every bullet must carry a "
+         "numeric performance metric; those metrics are written by the model and are not calibrated to any source. Colleague names and prior employers are also sampled in code, because the live "
          "test showed the model reusing the same few names and employers across profiles.")
 C.append(f"- Statistical alignment is checked in `src/validate.py` on {N2} sampled people (Section 5) and on 1,000 (`data/v2/spec1000/validation.md`).")
 C.append(f"- A live Gemini run produced {len(c15)} new profiles with {len(meta15['narrative_issues'])} narrative-validation failures after retries (Section 7).\n")
@@ -364,7 +365,8 @@ for name, src, grade, note in E.PARAM_REGISTRY:
     C.append(f"| {name} | {src} | {grade} | {note} |")
 C.append("\n## 7. Live generation test (15 profiles)\n")
 C.append(f"Backend: Gemini (`GeminiBackend`; configured primary `gemini-3.5-flash-lite` with fallback). Seed 31. Output in `data/v2/test15/`. "
-         f"Narrative-validation failures after up to 3 attempts per profile: {len(meta15['narrative_issues'])}.\n")
+         f"Narrative-validation failures after up to 3 attempts per profile: {len(meta15['narrative_issues'])}. "
+         f"This run used prompt {meta15.get('prompt_version')}, before the 450-550-word resume with per-bullet metrics.\n")
 t15c = Counter(s["industry"] for s in t15)
 C.append(f"- Industry: {dict(t15c)}; career stage: {dict(Counter(c['career_stage'] for c in c15))}.")
 pub15 = rd(ROOT / "data/v2/test15/profiles_public.jsonl")

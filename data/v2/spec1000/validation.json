@@ -1,0 +1,699 @@
+{
+ "n": 1000,
+ "implementation": [
+  {
+   "quantity": "Industry mix (BLS CES)",
+   "observed": {
+    "Finance": 0.073,
+    "Healthcare": 0.342,
+    "Tech": 0.193,
+    "Government": 0.183,
+    "Education": 0.209
+   },
+   "target": {
+    "Finance": 0.093,
+    "Healthcare": 0.335,
+    "Tech": 0.19,
+    "Government": 0.175,
+    "Education": 0.208
+   },
+   "n": 1000,
+   "tv": 0.0199,
+   "chi2_p": 0.305
+  },
+  {
+   "quantity": "Firm-size class, Finance (Census SUSB, employee-weighted)",
+   "observed": {
+    "<20": 0.068,
+    "20-99": 0.027,
+    "100-499": 0.123,
+    "500-4999": 0.315,
+    "5000+": 0.466
+   },
+   "target": {
+    "<20": 0.102,
+    "20-99": 0.067,
+    "100-499": 0.107,
+    "500-4999": 0.205,
+    "5000+": 0.519
+   },
+   "n": 73,
+   "tv": 0.1265,
+   "chi2_p": 0.117
+  },
+  {
+   "quantity": "Firm-size class, Healthcare (Census SUSB, employee-weighted)",
+   "observed": {
+    "<20": 0.137,
+    "20-99": 0.143,
+    "100-499": 0.175,
+    "500-4999": 0.187,
+    "5000+": 0.357
+   },
+   "target": {
+    "<20": 0.129,
+    "20-99": 0.147,
+    "100-499": 0.162,
+    "500-4999": 0.212,
+    "5000+": 0.351
+   },
+   "n": 342,
+   "tv": 0.028,
+   "chi2_p": 0.806
+  },
+  {
+   "quantity": "Firm-size class, Tech (Census SUSB, employee-weighted)",
+   "observed": {
+    "<20": 0.202,
+    "20-99": 0.14,
+    "100-499": 0.145,
+    "500-4999": 0.15,
+    "5000+": 0.363
+   },
+   "target": {
+    "<20": 0.19,
+    "20-99": 0.145,
+    "100-499": 0.144,
+    "500-4999": 0.189,
+    "5000+": 0.332
+   },
+   "n": 193,
+   "tv": 0.0437,
+   "chi2_p": 0.688
+  },
+  {
+   "quantity": "Firm-size class, Government (Census SUSB, employee-weighted) [assumed targets]",
+   "observed": {
+    "<20": 0.0,
+    "20-99": 0.044,
+    "100-499": 0.06,
+    "500-4999": 0.301,
+    "5000+": 0.596
+   },
+   "target": {
+    "<20": 0.01,
+    "20-99": 0.04,
+    "100-499": 0.1,
+    "500-4999": 0.25,
+    "5000+": 0.6
+   },
+   "n": 183,
+   "tv": 0.0543,
+   "chi2_p": 0.154
+  },
+  {
+   "quantity": "Firm-size class, Education (Census SUSB, employee-weighted)",
+   "observed": {
+    "<20": 0.144,
+    "20-99": 0.124,
+    "100-499": 0.187,
+    "500-4999": 0.306,
+    "5000+": 0.239
+   },
+   "target": {
+    "<20": 0.099,
+    "20-99": 0.178,
+    "100-499": 0.196,
+    "500-4999": 0.287,
+    "5000+": 0.24
+   },
+   "n": 209,
+   "tv": 0.0638,
+   "chi2_p": 0.096
+  },
+  {
+   "quantity": "Role mix, Finance (BLS OEWS)",
+   "observed": {
+    "Executive / senior leader": 0.247,
+    "Finance / accounting": 0.288,
+    "HR / payroll": 0.041,
+    "IT admin / help desk": 0.055,
+    "Executive assistant": 0.096,
+    "Engineer / researcher": 0.192,
+    "Legal / compliance": 0.068,
+    "Government / defense personnel": 0.0,
+    "Journalist / communications": 0.014
+   },
+   "target": {
+    "Executive / senior leader": 0.261,
+    "Finance / accounting": 0.222,
+    "HR / payroll": 0.056,
+    "IT admin / help desk": 0.114,
+    "Executive assistant": 0.067,
+    "Engineer / researcher": 0.167,
+    "Legal / compliance": 0.099,
+    "Government / defense personnel": 0.0,
+    "Journalist / communications": 0.015
+   },
+   "n": 73,
+   "tv": 0.1195,
+   "chi2_p": 0.552
+  },
+  {
+   "quantity": "Role mix, Healthcare (BLS OEWS)",
+   "observed": {
+    "Executive / senior leader": 0.202,
+    "Finance / accounting": 0.237,
+    "HR / payroll": 0.135,
+    "IT admin / help desk": 0.085,
+    "Executive assistant": 0.053,
+    "Engineer / researcher": 0.219,
+    "Legal / compliance": 0.05,
+    "Government / defense personnel": 0.0,
+    "Journalist / communications": 0.02
+   },
+   "target": {
+    "Executive / senior leader": 0.232,
+    "Finance / accounting": 0.212,
+    "HR / payroll": 0.134,
+    "IT admin / help desk": 0.082,
+    "Executive assistant": 0.063,
+    "Engineer / researcher": 0.203,
+    "Legal / compliance": 0.047,
+    "Government / defense personnel": 0.0,
+    "Journalist / communications": 0.027
+   },
+   "n": 342,
+   "tv": 0.0479,
+   "chi2_p": 0.766
+  },
+  {
+   "quantity": "Role mix, Tech (BLS OEWS)",
+   "observed": {
+    "Executive / senior leader": 0.093,
+    "Finance / accounting": 0.109,
+    "HR / payroll": 0.057,
+    "IT admin / help desk": 0.114,
+    "Executive assistant": 0.01,
+    "Engineer / researcher": 0.446,
+    "Legal / compliance": 0.145,
+    "Government / defense personnel": 0.0,
+    "Journalist / communications": 0.026
+   },
+   "target": {
+    "Executive / senior leader": 0.103,
+    "Finance / accounting": 0.136,
+    "HR / payroll": 0.034,
+    "IT admin / help desk": 0.113,
+    "Executive assistant": 0.014,
+    "Engineer / researcher": 0.436,
+    "Legal / compliance": 0.143,
+    "Government / defense personnel": 0.0,
+    "Journalist / communications": 0.022
+   },
+   "n": 193,
+   "tv": 0.0404,
+   "chi2_p": 0.708
+  },
+  {
+   "quantity": "Role mix, Government (BLS OEWS)",
+   "observed": {
+    "Executive / senior leader": 0.126,
+    "Finance / accounting": 0.131,
+    "HR / payroll": 0.044,
+    "IT admin / help desk": 0.098,
+    "Executive assistant": 0.016,
+    "Engineer / researcher": 0.29,
+    "Legal / compliance": 0.18,
+    "Government / defense personnel": 0.104,
+    "Journalist / communications": 0.011
+   },
+   "target": {
+    "Executive / senior leader": 0.105,
+    "Finance / accounting": 0.109,
+    "HR / payroll": 0.05,
+    "IT admin / help desk": 0.092,
+    "Executive assistant": 0.034,
+    "Engineer / researcher": 0.344,
+    "Legal / compliance": 0.176,
+    "Government / defense personnel": 0.075,
+    "Journalist / communications": 0.015
+   },
+   "n": 183,
+   "tv": 0.0826,
+   "chi2_p": 0.501
+  },
+  {
+   "quantity": "Role mix, Education (BLS OEWS)",
+   "observed": {
+    "Executive / senior leader": 0.144,
+    "Finance / accounting": 0.177,
+    "HR / payroll": 0.067,
+    "IT admin / help desk": 0.144,
+    "Executive assistant": 0.057,
+    "Engineer / researcher": 0.325,
+    "Legal / compliance": 0.029,
+    "Government / defense personnel": 0.0,
+    "Journalist / communications": 0.057
+   },
+   "target": {
+    "Executive / senior leader": 0.114,
+    "Finance / accounting": 0.156,
+    "HR / payroll": 0.074,
+    "IT admin / help desk": 0.196,
+    "Executive assistant": 0.094,
+    "Engineer / researcher": 0.296,
+    "Legal / compliance": 0.025,
+    "Government / defense personnel": 0.0,
+    "Journalist / communications": 0.045
+   },
+   "n": 209,
+   "tv": 0.096,
+   "chi2_p": 0.212
+  }
+ ],
+ "heldout": [
+  {
+   "quantity": "Median tenure, age 25+ (BLS Jan 2026: 4.9 yrs)",
+   "observed": 5.28,
+   "target": 4.9,
+   "note": "Sampler uses medians by age band only; the overall median is not fit."
+  },
+  {
+   "quantity": "Median tenure, all (BLS: 4.1 yrs)",
+   "observed": 4.66,
+   "target": 4.1,
+   "note": "Prime-target occupations skew older than all workers; Students cap tenure at 2 yrs."
+  },
+  {
+   "quantity": "Median tenure, age 20-24",
+   "observed": 1.0,
+   "target": 1.5,
+   "note": "n=59; tenure capped at time in labor force"
+  },
+  {
+   "quantity": "Median tenure, age 25-34",
+   "observed": 3.0,
+   "target": 3.0,
+   "note": "n=207; tenure capped at time in labor force"
+  },
+  {
+   "quantity": "Median tenure, age 35-44",
+   "observed": 4.26,
+   "target": 4.7,
+   "note": "n=259; tenure capped at time in labor force"
+  },
+  {
+   "quantity": "Median tenure, age 45-54",
+   "observed": 7.22,
+   "target": 7.0,
+   "note": "n=212; tenure capped at time in labor force"
+  },
+  {
+   "quantity": "Median tenure, age 55-64",
+   "observed": 9.44,
+   "target": 9.6,
+   "note": "n=163; tenure capped at time in labor force"
+  },
+  {
+   "quantity": "Median tenure, age 65-99",
+   "observed": 10.3,
+   "target": 9.9,
+   "note": "n=84; tenure capped at time in labor force"
+  },
+  {
+   "quantity": "Median age, Executive / senior leader (CPS 11b)",
+   "observed": 44.0,
+   "target": 46.1,
+   "note": "n=158; role medians are cross-industry"
+  },
+  {
+   "quantity": "Median age, Finance / accounting (CPS 11b)",
+   "observed": 49.5,
+   "target": 46.8,
+   "note": "n=184; role medians are cross-industry"
+  },
+  {
+   "quantity": "Median age, HR / payroll (CPS 11b)",
+   "observed": 41.0,
+   "target": 42.0,
+   "note": "n=82; role medians are cross-industry"
+  },
+  {
+   "quantity": "Median age, IT admin / help desk (CPS 11b)",
+   "observed": 40.0,
+   "target": 42.6,
+   "note": "n=103; role medians are cross-industry"
+  },
+  {
+   "quantity": "Median age, Engineer / researcher (CPS 11b)",
+   "observed": 39.0,
+   "target": 38.6,
+   "note": "n=296; role medians are cross-industry"
+  },
+  {
+   "quantity": "Median age, Legal / compliance (CPS 11b)",
+   "observed": 44.0,
+   "target": 45.8,
+   "note": "n=89; role medians are cross-industry"
+  },
+  {
+   "quantity": "Median age, all sampled (CPS all-employed: 42.1)",
+   "observed": 43.0,
+   "target": 42.1,
+   "note": "Roles skew older than all workers"
+  },
+  {
+   "quantity": "LinkedIn use, college graduates (Pew 2026: 51%)",
+   "observed": 0.531,
+   "target": 0.51,
+   "note": "n=650; our sample skews 30-55, Pew averages all adults"
+  },
+  {
+   "quantity": "LinkedIn use, HS or less (Pew 2026: 13%)",
+   "observed": 0.169,
+   "target": 0.13,
+   "note": "n=77; age 25+, excluding the 500+-firm executive override"
+  },
+  {
+   "quantity": "Mean simulated-phish click probability (KnowBe4: ~27% avg, 2025 baseline 33.1%)",
+   "observed": 0.241,
+   "target": "0.27-0.33",
+   "note": "Inputs: industry x size baseline, training factor, new-hire factor"
+  },
+  {
+   "quantity": "Mean baseline phish-prone % before training factor (KnowBe4 older edition avg ~27%)",
+   "observed": 0.266,
+   "target": 0.27,
+   "note": "Industry x size matrix weighted by this sample's mix"
+  },
+  {
+   "quantity": "Share of new hires (tenure <= 90 days)",
+   "observed": 0.045,
+   "target": "derived",
+   "note": "Implied by exponential tenure model; no direct benchmark"
+  },
+  {
+   "quantity": "Median email checks per day (Mark 2016: 77)",
+   "observed": 77.2,
+   "target": 77.0,
+   "note": ""
+  },
+  {
+   "quantity": "Mean emails received per day (Microsoft 2025: 117)",
+   "observed": 123.5,
+   "target": 117.0,
+   "note": "Role factors raise it slightly"
+  },
+  {
+   "quantity": "Share in inbox by 10 pm (Microsoft 2025: 29%)",
+   "observed": 0.304,
+   "target": 0.29,
+   "note": ""
+  }
+ ],
+ "sex_by_role": [
+  {
+   "role": "Executive / senior leader",
+   "n": 158,
+   "observed": 0.462,
+   "target": 0.418,
+   "z": 1.12
+  },
+  {
+   "role": "Finance / accounting",
+   "n": 184,
+   "observed": 0.728,
+   "target": 0.689,
+   "z": 1.15
+  },
+  {
+   "role": "HR / payroll",
+   "n": 82,
+   "observed": 0.768,
+   "target": 0.783,
+   "z": -0.32
+  },
+  {
+   "role": "IT admin / help desk",
+   "n": 103,
+   "observed": 0.282,
+   "target": 0.271,
+   "z": 0.25
+  },
+  {
+   "role": "Executive assistant",
+   "n": 42,
+   "observed": 0.929,
+   "target": 0.935,
+   "z": -0.17
+  },
+  {
+   "role": "Engineer / researcher",
+   "n": 296,
+   "observed": 0.247,
+   "target": 0.203,
+   "z": 1.87
+  },
+  {
+   "role": "Legal / compliance",
+   "n": 89,
+   "observed": 0.517,
+   "target": 0.543,
+   "z": -0.5
+  },
+  {
+   "role": "Government / defense personnel",
+   "n": 19,
+   "observed": 0.474,
+   "target": 0.471,
+   "z": 0.02
+  },
+  {
+   "role": "Journalist / communications",
+   "n": 27,
+   "observed": 0.37,
+   "target": 0.411,
+   "z": -0.43
+  }
+ ],
+ "education_by_role": [
+  {
+   "role": "Executive / senior leader",
+   "n": 149,
+   "tv": 0.0567,
+   "chi2_p": 0.765,
+   "observed": {
+    "less_than_hs": 0.013,
+    "high_school": 0.168,
+    "some_college": 0.208,
+    "associate": 0.081,
+    "bachelor": 0.389,
+    "master": 0.114,
+    "doctoral": 0.027
+   },
+   "target": {
+    "less_than_hs": 0.032,
+    "high_school": 0.165,
+    "some_college": 0.226,
+    "associate": 0.093,
+    "bachelor": 0.34,
+    "master": 0.122,
+    "doctoral": 0.023
+   }
+  },
+  {
+   "role": "Finance / accounting",
+   "n": 181,
+   "tv": 0.0535,
+   "chi2_p": 0.708,
+   "observed": {
+    "less_than_hs": 0.028,
+    "high_school": 0.094,
+    "some_college": 0.16,
+    "associate": 0.077,
+    "bachelor": 0.453,
+    "master": 0.16,
+    "doctoral": 0.028
+   },
+   "target": {
+    "less_than_hs": 0.017,
+    "high_school": 0.114,
+    "some_college": 0.158,
+    "associate": 0.1,
+    "bachelor": 0.418,
+    "master": 0.171,
+    "doctoral": 0.022
+   }
+  },
+  {
+   "role": "HR / payroll",
+   "n": 73,
+   "tv": 0.1183,
+   "chi2_p": 0.254,
+   "observed": {
+    "less_than_hs": 0.014,
+    "high_school": 0.068,
+    "some_college": 0.219,
+    "associate": 0.082,
+    "bachelor": 0.493,
+    "master": 0.096,
+    "doctoral": 0.027
+   },
+   "target": {
+    "less_than_hs": 0.012,
+    "high_school": 0.093,
+    "some_college": 0.151,
+    "associate": 0.079,
+    "bachelor": 0.456,
+    "master": 0.19,
+    "doctoral": 0.02
+   }
+  },
+  {
+   "role": "IT admin / help desk",
+   "n": 87,
+   "tv": 0.1392,
+   "chi2_p": 0.049,
+   "observed": {
+    "less_than_hs": 0.023,
+    "high_school": 0.172,
+    "some_college": 0.126,
+    "associate": 0.207,
+    "bachelor": 0.356,
+    "master": 0.115,
+    "doctoral": 0.0
+   },
+   "target": {
+    "less_than_hs": 0.012,
+    "high_school": 0.102,
+    "some_college": 0.233,
+    "associate": 0.149,
+    "bachelor": 0.371,
+    "master": 0.118,
+    "doctoral": 0.015
+   }
+  },
+  {
+   "role": "Executive assistant",
+   "n": 41,
+   "tv": 0.1118,
+   "chi2_p": 0.837,
+   "observed": {
+    "less_than_hs": 0.049,
+    "high_school": 0.098,
+    "some_college": 0.22,
+    "associate": 0.098,
+    "bachelor": 0.415,
+    "master": 0.098,
+    "doctoral": 0.024
+   },
+   "target": {
+    "less_than_hs": 0.013,
+    "high_school": 0.136,
+    "some_college": 0.265,
+    "associate": 0.126,
+    "bachelor": 0.36,
+    "master": 0.089,
+    "doctoral": 0.012
+   }
+  },
+  {
+   "role": "Engineer / researcher",
+   "n": 247,
+   "tv": 0.0627,
+   "chi2_p": 0.461,
+   "observed": {
+    "less_than_hs": 0.0,
+    "high_school": 0.02,
+    "some_college": 0.077,
+    "associate": 0.049,
+    "bachelor": 0.567,
+    "master": 0.259,
+    "doctoral": 0.028
+   },
+   "target": {
+    "less_than_hs": 0.006,
+    "high_school": 0.022,
+    "some_college": 0.073,
+    "associate": 0.039,
+    "bachelor": 0.518,
+    "master": 0.302,
+    "doctoral": 0.04
+   }
+  },
+  {
+   "role": "Legal / compliance",
+   "n": 86,
+   "tv": 0.0813,
+   "chi2_p": 0.444,
+   "observed": {
+    "less_than_hs": 0.0,
+    "high_school": 0.047,
+    "some_college": 0.058,
+    "associate": 0.012,
+    "bachelor": 0.198,
+    "master": 0.093,
+    "doctoral": 0.593
+   },
+   "target": {
+    "less_than_hs": 0.007,
+    "high_school": 0.049,
+    "some_college": 0.079,
+    "associate": 0.06,
+    "bachelor": 0.2,
+    "master": 0.076,
+    "doctoral": 0.528
+   }
+  }
+ ],
+ "distributions": {
+  "career_stage": {
+   "High Level": 152,
+   "Mid Level": 615,
+   "Entry Level": 55,
+   "Student": 50,
+   "Executive": 128
+  },
+  "security_awareness": {
+   "medium": 611,
+   "high": 227,
+   "low": 162
+  },
+  "busy_level": {
+   "high": 278,
+   "medium": 528,
+   "low": 194
+  },
+  "footprint_level": {
+   "high": 422,
+   "medium": 349,
+   "low": 229
+  },
+  "company_size": {
+   "Large": 620,
+   "Small": 233,
+   "Medium": 147
+  },
+  "gender": {
+   "man": 524,
+   "woman": 476
+  },
+  "platforms": {
+   "Instagram": 554,
+   "GitHub": 208,
+   "LinkedIn": 470,
+   "Facebook": 725,
+   "X": 166,
+   "ResearchGate": 57
+  },
+  "highest_education": {
+   "master": 163,
+   "bachelor": 416,
+   "high_school": 130,
+   "associate": 78,
+   "some_college": 129,
+   "doctoral": 71,
+   "less_than_hs": 13
+  },
+  "n_orgs": 246
+ },
+ "distinctness": {
+  "unique_names": 1000,
+  "unique_first": 516,
+  "unique_last": 786,
+  "unique_titles": 85,
+  "unique_schools": 581,
+  "duplicate_org_domains": 0
+ }
+}

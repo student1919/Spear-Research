@@ -1,76 +1,12 @@
-"""Claude-authored content pools for the local generation backend.
+"""Content pools for the offline LocalBackend (src/llm.py).
 
-These let the pipeline produce the initial 100+100 run with no API key: the local
-backend composes profiles and emails from these fragments. When the Anthropic
-backend is switched on, these pools are unused (the model writes the text). They
-are deliberately finite, which makes templated repetition measurable in the
-detectability analysis.
+LocalBackend composes narrative text and emails from these fragments so the whole
+v2 pipeline can be dry-run with no API key. Live backends do not use them (the model
+writes the text). Names, companies, titles and locations come from src/population.py.
+Role keys use the older role labels; LocalBackend maps the population roles onto them.
 """
 
 from __future__ import annotations
-
-FIRST_NAMES = [
-    "Amara", "Devin", "Priya", "Marcus", "Sofia", "Ethan", "Leila", "Jamal",
-    "Hana", "Oscar", "Nadia", "Theo", "Yuki", "Grace", "Ibrahim", "Clara",
-    "Diego", "Wei", "Fatima", "Noah", "Ingrid", "Omar", "Rosa", "Kenji",
-    "Lena", "Andre", "Mei", "Samuel", "Zara", "Victor", "Aisha", "Lucas",
-    "Tara", "Henrik", "Bianca", "Raj", "Elena", "Cole", "Nina", "Mateo",
-]
-
-LAST_NAMES = [
-    "Okafor", "Reyes", "Nakamura", "Bauer", "Haddad", "Lindqvist", "Santos",
-    "Chen", "Abara", "Delgado", "Novak", "Kowalski", "Mensah", "Ivanova",
-    "Tran", "Rossi", "Fernandez", "Larsen", "Khan", "Moreau", "Schmidt",
-    "Oyelaran", "Petrov", "Nguyen", "Blackwood", "Castellano", "Adeyemi",
-    "Wallace", "Qureshi", "Bergström", "Vargas", "Hoffmann", "Sato", "Dubois",
-]
-
-CITIES = [
-    "Austin, TX", "Columbus, OH", "Portland, OR", "Raleigh, NC", "Denver, CO",
-    "Minneapolis, MN", "Sacramento, CA", "Pittsburgh, PA", "Tampa, FL",
-    "Richmond, VA", "Boise, ID", "Hartford, CT", "Albany, NY", "Madison, WI",
-    "Spokane, WA", "Tucson, AZ", "Omaha, NE", "Providence, RI",
-]
-
-# Company name parts per industry. Domains are derived as a slug under .example.
-COMPANY_PARTS = {
-    "Finance": (["Meridian", "Cairnwell", "Haskett", "Brightmoor", "Talford"],
-                ["Capital", "Financial", "Partners", "Trust", "Advisory"]),
-    "Healthcare": (["Alderwood", "Vireo", "Northbay", "Calyx", "Everwell"],
-                   ["Health", "Care Systems", "Medical", "Clinics", "Diagnostics"]),
-    "Tech": (["Lumat", "Fernstack", "Orbital", "Quillon", "Pinemark"],
-             ["Labs", "Systems", "Software", "Technologies", "Dynamics"]),
-    "Government": (["Harbor County", "Westridge", "Lakeshore", "Fallon District",
-                    "Crestline"],
-                   ["Authority", "Agency", "Services", "Bureau", "Council"]),
-    "Education": (["Ashgrove", "Brightland", "Kelmore", "Oakbridge", "Sterling"],
-                  ["University", "Institute", "College", "Academy", "School District"]),
-}
-
-SOCIAL_PLATFORMS = ["LinkedIn", "GitHub", "X", "Mastodon", "ResearchGate", "Medium"]
-
-# --- Titles: base title per role, modified by career stage ------------------
-
-ROLE_BASE_TITLE = {
-    "Executive / senior leader": "Operations Officer",
-    "Finance / accounting": "Accountant",
-    "HR / payroll": "HR Generalist",
-    "IT admin / help desk": "Systems Administrator",
-    "Executive assistant": "Executive Assistant",
-    "Engineer / researcher (valuable data)": "Engineer",
-    "Legal / compliance": "Counsel",
-    "Government / defense personnel": "Program Analyst",
-    "Journalist / activist / political": "Reporter",
-    "New hire": "Associate",
-}
-
-STAGE_PREFIX = {
-    "Student": "Intern,",
-    "Entry Level": "Junior",
-    "Mid Level": "",
-    "High Level": "Senior",
-    "Executive": "Chief",
-}
 
 ROLE_RESUME = {
     "Executive / senior leader": [

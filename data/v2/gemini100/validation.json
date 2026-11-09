@@ -1,0 +1,253 @@
+{
+ "n": 100,
+ "implementation": [
+  {
+   "quantity": "Industry mix (BLS CES)",
+   "observed": {
+    "Finance": 0.0,
+    "Healthcare": 0.0,
+    "Tech": 1.0,
+    "Government": 0.0,
+    "Education": 0.0
+   },
+   "target": {
+    "Finance": 0.093,
+    "Healthcare": 0.335,
+    "Tech": 0.19,
+    "Government": 0.175,
+    "Education": 0.208
+   },
+   "n": 100,
+   "tv": 0.8102,
+   "chi2_p": 0.0
+  },
+  {
+   "quantity": "Firm-size class, Tech (Census SUSB, employee-weighted)",
+   "observed": {
+    "<20": 0.0,
+    "20-99": 0.0,
+    "100-499": 0.0,
+    "500-4999": 0.0,
+    "5000+": 1.0
+   },
+   "target": {
+    "<20": 0.19,
+    "20-99": 0.145,
+    "100-499": 0.144,
+    "500-4999": 0.189,
+    "5000+": 0.332
+   },
+   "n": 100,
+   "tv": 0.6677,
+   "chi2_p": 0.0
+  },
+  {
+   "quantity": "Role mix, Tech (BLS OEWS)",
+   "observed": {
+    "Executive / senior leader": 0.16,
+    "Finance / accounting": 0.12,
+    "HR / payroll": 0.04,
+    "IT admin / help desk": 0.07,
+    "Executive assistant": 0.01,
+    "Engineer / researcher": 0.41,
+    "Legal / compliance": 0.17,
+    "Government / defense personnel": 0.0,
+    "Journalist / communications": 0.02
+   },
+   "target": {
+    "Executive / senior leader": 0.103,
+    "Finance / accounting": 0.136,
+    "HR / payroll": 0.034,
+    "IT admin / help desk": 0.113,
+    "Executive assistant": 0.014,
+    "Engineer / researcher": 0.436,
+    "Legal / compliance": 0.143,
+    "Government / defense personnel": 0.0,
+    "Journalist / communications": 0.022
+   },
+   "n": 100,
+   "tv": 0.0899,
+   "chi2_p": 0.562
+  }
+ ],
+ "heldout": [
+  {
+   "quantity": "Median tenure, age 25+ (BLS Jan 2026: 4.9 yrs)",
+   "observed": 4.72,
+   "target": 4.9,
+   "note": "Sampler uses medians by age band only; the overall median is not fit."
+  },
+  {
+   "quantity": "Median tenure, all (BLS: 4.1 yrs)",
+   "observed": 3.88,
+   "target": 4.1,
+   "note": "Prime-target occupations skew older than all workers; Students cap tenure at 2 yrs."
+  },
+  {
+   "quantity": "Median tenure, age 25-34",
+   "observed": 2.57,
+   "target": 3.0,
+   "note": "n=25; tenure capped at time in labor force"
+  },
+  {
+   "quantity": "Median tenure, age 35-44",
+   "observed": 3.49,
+   "target": 4.7,
+   "note": "n=21; tenure capped at time in labor force"
+  },
+  {
+   "quantity": "Median age, all sampled (CPS all-employed: 42.1)",
+   "observed": 40.5,
+   "target": 42.1,
+   "note": "Roles skew older than all workers"
+  },
+  {
+   "quantity": "LinkedIn use, college graduates (Pew 2026: 51%)",
+   "observed": 0.464,
+   "target": 0.51,
+   "note": "n=69; our sample skews 30-55, Pew averages all adults"
+  },
+  {
+   "quantity": "Mean simulated-phish click probability (KnowBe4: ~27% avg, 2025 baseline 33.1%)",
+   "observed": 0.235,
+   "target": "0.27-0.33",
+   "note": "Inputs: industry x size baseline, training factor, new-hire factor"
+  },
+  {
+   "quantity": "Mean baseline phish-prone % before training factor (KnowBe4 older edition avg ~27%)",
+   "observed": 0.289,
+   "target": 0.27,
+   "note": "Industry x size matrix weighted by this sample's mix"
+  },
+  {
+   "quantity": "Share of new hires (tenure <= 90 days)",
+   "observed": 0.04,
+   "target": "derived",
+   "note": "Implied by exponential tenure model; no direct benchmark"
+  },
+  {
+   "quantity": "Median email checks per day (Mark 2016: 77)",
+   "observed": 80.0,
+   "target": 77.0,
+   "note": ""
+  },
+  {
+   "quantity": "Mean emails received per day (Microsoft 2025: 117)",
+   "observed": 111.8,
+   "target": 117.0,
+   "note": "Role factors raise it slightly"
+  },
+  {
+   "quantity": "Share in inbox by 10 pm (Microsoft 2025: 29%)",
+   "observed": 0.33,
+   "target": 0.29,
+   "note": ""
+  }
+ ],
+ "sex_by_role": [
+  {
+   "role": "Executive / senior leader",
+   "n": 16,
+   "observed": 0.312,
+   "target": 0.418,
+   "z": -0.86
+  },
+  {
+   "role": "Engineer / researcher",
+   "n": 41,
+   "observed": 0.098,
+   "target": 0.203,
+   "z": -1.68
+  },
+  {
+   "role": "Legal / compliance",
+   "n": 17,
+   "observed": 0.471,
+   "target": 0.543,
+   "z": -0.6
+  }
+ ],
+ "education_by_role": [
+  {
+   "role": "Engineer / researcher",
+   "n": 32,
+   "tv": 0.1167,
+   "chi2_p": 0.755,
+   "observed": {
+    "less_than_hs": 0.0,
+    "high_school": 0.031,
+    "some_college": 0.031,
+    "associate": 0.031,
+    "bachelor": 0.625,
+    "master": 0.25,
+    "doctoral": 0.031
+   },
+   "target": {
+    "less_than_hs": 0.006,
+    "high_school": 0.022,
+    "some_college": 0.073,
+    "associate": 0.039,
+    "bachelor": 0.518,
+    "master": 0.302,
+    "doctoral": 0.04
+   }
+  }
+ ],
+ "distributions": {
+  "career_stage": {
+   "Mid Level": 54,
+   "Entry Level": 14,
+   "High Level": 17,
+   "Executive": 11,
+   "Student": 4
+  },
+  "security_awareness": {
+   "medium": 64,
+   "high": 23,
+   "low": 13
+  },
+  "busy_level": {
+   "medium": 62,
+   "low": 17,
+   "high": 21
+  },
+  "footprint_level": {
+   "low": 20,
+   "high": 39,
+   "medium": 41
+  },
+  "company_size": {
+   "Large": 100
+  },
+  "gender": {
+   "man": 71,
+   "woman": 29
+  },
+  "platforms": {
+   "Facebook": 68,
+   "GitHub": 25,
+   "ResearchGate": 10,
+   "LinkedIn": 44,
+   "Instagram": 59,
+   "X": 17
+  },
+  "highest_education": {
+   "doctoral": 8,
+   "bachelor": 39,
+   "associate": 6,
+   "some_college": 12,
+   "master": 22,
+   "high_school": 12,
+   "less_than_hs": 1
+  },
+  "n_orgs": 1
+ },
+ "distinctness": {
+  "unique_names": 100,
+  "unique_first": 81,
+  "unique_last": 94,
+  "unique_titles": 46,
+  "unique_schools": 106,
+  "duplicate_org_domains": 0
+ }
+}

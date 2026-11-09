@@ -1,0 +1,52 @@
+[1/6] sampling 100 calibrated people (seed 21)
+[2/6] validating the sampled population against the sources
+[3/6] generating narratives with backend=gemini
+  generated 5/100
+  profile 8: kept after 3 attempts with issues: ['the resume has 397 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 16 bullets now average 25 words and need to average about 31 (add about 103 words overall)']
+  generated 10/100
+  profile 11: kept after 3 attempts with issues: ['the resume has 415 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 14 bullets now average 30 words and need to average about 36 (add about 85 words overall)']
+  profile 12: kept after 3 attempts with issues: ['the resume has 557 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 16 bullets now average 35 words and need to average about 31 (cut about 57 words overall)']
+  generated 15/100
+  profile 17: kept after 3 attempts with issues: ['the resume has 442 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 58 words overall)']
+  generated 20/100
+  generated 25/100
+  profile 26: kept after 3 attempts with issues: ['the resume has 417 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 14 bullets now average 30 words and need to average about 36 (add about 83 words overall)']
+  profile 28: kept after 3 attempts with issues: ['the resume has 427 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 33 words and need to average about 38 (add about 73 words overall)']
+  generated 30/100
+  profile 32: kept after 3 attempts with issues: ['the resume has 411 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 32 words and need to average about 38 (add about 89 words overall)']
+  profile 34: kept after 3 attempts with issues: ['the resume has 416 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 32 words and need to average about 38 (add about 84 words overall)']
+  generated 35/100
+  generated 40/100
+  generated 45/100
+  profile 47: kept after 3 attempts with issues: ['the resume has 433 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 14 bullets now average 31 words and need to average about 36 (add about 67 words overall)']
+  generated 50/100
+  generated 55/100
+  profile 55: kept after 3 attempts with issues: ['the resume has 423 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 33 words and need to average about 38 (add about 77 words overall)']
+  profile 56: kept after 3 attempts with issues: ['the resume has 362 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 28 words and need to average about 38 (add about 138 words overall)']
+  generated 60/100
+  profile 60: kept after 3 attempts with issues: ['the resume has 343 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 26 words and need to average about 38 (add about 157 words overall)']
+  profile 61: kept after 3 attempts with issues: ['the resume has 444 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 56 words overall)']
+  profile 63: kept after 3 attempts with issues: ['the resume has 388 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 23 words and need to average about 29 (add about 112 words overall)']
+  generated 65/100
+  profile 68: kept after 3 attempts with issues: ['the resume has 396 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 23 words and need to average about 29 (add about 104 words overall)']
+  generated 70/100
+  profile 71: kept after 3 attempts with issues: ['the resume has 416 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 32 words and need to average about 38 (add about 84 words overall)']
+  profile 72: kept after 3 attempts with issues: ['the resume has 409 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 31 words and need to average about 38 (add about 91 words overall)']
+  profile 73: kept after 3 attempts with issues: ['resume.education bullet must mention University of Montevallo', 'the resume has 437 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 63 words overall)']
+  generated 75/100
+  profile 76: kept after 3 attempts with issues: ['the resume has 437 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 63 words overall)']
+  generated 80/100
+  profile 81: kept after 3 attempts with issues: ['the resume has 434 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 66 words overall)']
+  generated 85/100
+  profile 89: kept after 3 attempts with issues: ['the resume has 446 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 54 words overall)']
+  generated 90/100
+  profile 90: kept after 3 attempts with issues: ['the resume has 407 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 31 words and need to average about 38 (add about 93 words overall)']
+  profile 93: kept after 3 attempts with issues: ['the resume has 597 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 35 words and need to average about 29 (cut about 97 words overall)']
+  generated 95/100
+  profile 96: kept after 3 attempts with issues: ['the resume has 411 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 32 words and need to average about 38 (add about 89 words overall)']
+  generated 100/100
+[4/6] generating 0 spear emails
+[5/6] writing JSONL + SQLite
+[6/6] analyzing + writing report
+Done: data/v2/gemini100  (DB tables: {'orgs': 1, 'core': 100, 'public': 100, 'private': 100, 'behavior': 100, 'emails_attack': 0}; narrative issues: 24; email issues: 0)
+Report: data/v2/gemini100/REPORT.md

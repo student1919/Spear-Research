@@ -1,4 +1,4 @@
-"""Record schemas for the synthetic dataset (Profiles.md layout).
+"""Record schemas for the synthetic dataset (Profiles.md layout, v2 pipeline).
 
 One dataclass per JSONL file. Everything is linked by ``profile_id`` (orgs by
 ``org_id``). ``asdict``/JSONL helpers keep the on-disk format stable regardless
@@ -21,13 +21,13 @@ class Org:
     name: str
     domain: str              # synthetic; always under an *.example zone
     industry: str
-    size: str                # Small | Medium | Large
+    size: str                # Small | Medium | Large (derived from size_class)
     headcount: int
     hq_city: str
     founded: int
     org_chart: list[dict[str, str]]  # [{title, reports_to}] skeleton
     synthetic: bool = True
-    size_class: str = ""     # v2: SUSB enterprise-size class (<20, 20-99, 100-499, 500-4999, 5000+)
+    size_class: str = ""     # SUSB enterprise-size class (<20, 20-99, 100-499, 500-4999, 5000+)
 
 
 # --- Profile pieces (one file each) -----------------------------------------
@@ -43,7 +43,7 @@ class ProfileCore:
     target_role: str
     title: str
     location: str
-    # v2 (empirically sampled; zero/empty in v1 data)
+    # empirically sampled (src/population.py)
     age: int = 0
     gender: str = ""
     birth_year: int = 0
@@ -57,12 +57,15 @@ class ProfileCore:
 @dataclass
 class ProfilePublic:
     profile_id: str
-    resume_bullets: list[str]
+    resume_bullets: list[str]           # every resume bullet in reading order (flattened `resume`)
     social_presence: dict[str, str]     # platform -> handle/url
     footprint_level: str                # low | medium | high
-    posts: list[dict[str, str]]         # [{date, text}]
+    posts: list[dict[str, str]]         # [{date, platform, text}]
     personal_website: str | None
-    # v2
+    resume: dict = field(default_factory=dict)   # {current_job: {title, employer_org_id, bullets},
+                                                 #  prior_jobs: [{employer, start_year, end_year, title, bullets}],
+                                                 #  education: [bullet per record]}
+    resume_word_count: int = 0
     education: list[dict] = field(default_factory=list)        # sampled: level, field, institution, grad_year
     career_history: list[dict] = field(default_factory=list)   # prior roles (fictional employers)
     platform_activity: dict[str, float] = field(default_factory=dict)   # platform -> public posts per month
@@ -86,7 +89,7 @@ class ProfileBehavior:
     security_awareness: str             # low | medium | high
     response_tendencies: dict[str, str] # cue -> likely reaction
     busy_level: str                     # low | medium | high
-    # v2 (numeric, sampled from calibrated distributions; categories above are derived from these)
+    # numeric, sampled from calibrated distributions; the categories above are derived from these
     p_click_simulated_phish: float = 0.0
     received_security_training: bool = False
     email_checks_per_day: float = 0.0

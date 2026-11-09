@@ -1,9 +1,9 @@
-"""Assemble the Markdown report (report/REPORT.md).
+"""Assemble the Markdown run report (<run dir>/REPORT.md) for a v2 run.
 
 The report is designed to be fed to another model that turns it into slides, so it
-leans on figures (in report/figures/) and compact tables. It states methodology,
-the generated distributions, examples, and the detectability pass as observations.
-Per project convention it contains no recommendations.
+leans on figures (in <run dir>/figures/) and compact tables. It states methodology,
+the generated distributions, resume statistics, examples, and the detectability pass
+as observations. Per project convention it contains no recommendations.
 """
 
 from __future__ import annotations
@@ -36,26 +36,36 @@ def _join_profiles(data_dir: Path) -> dict[str, dict]:
     public = by_id("public", "profile_id")
     private = by_id("private", "profile_id")
     behavior = by_id("behavior", "profile_id")
-    out = {}
-    for pid, c in core.items():
-        out[pid] = {"core": c, "public": public.get(pid, {}),
-                    "private": private.get(pid, {}), "behavior": behavior.get(pid, {})}
-    return out
+    return {pid: {"core": c, "public": public.get(pid, {}), "private": private.get(pid, {}),
+                  "behavior": behavior.get(pid, {})} for pid, c in core.items()}
 
 
 def _example_profile_md(p: dict) -> str:
     c, pub, pri, beh = p["core"], p["public"], p["private"], p["behavior"]
+    res = pub.get("resume") or {}
     lines = [
         f"**{c['full_name']}** — {c['title']}  ",
-        f"`{c['email']}` · {c['industry']} · {c['career_stage']} · "
-        f"target role: _{c['target_role']}_ · {c['location']}",
+        f"`{c['email']}` · {c['industry']} · {c['career_stage']} · target role: _{c['target_role']}_ · "
+        f"{c['location']} · age {c.get('age')} · tenure {c.get('tenure_years')} y",
         "",
-        "- Resume: " + "; ".join(pub.get("resume_bullets", [])),
+        f"Resume ({pub.get('resume_word_count', 0)} words):",
+        "",
+        f"- *{c['title']} (current)*",
+    ]
+    lines += [f"  - {b}" for b in (res.get("current_job") or {}).get("bullets", [])]
+    for job in res.get("prior_jobs", []):
+        lines.append(f"- *{job.get('title')}, {job.get('employer')} ({job.get('start_year')}–{job.get('end_year')})*")
+        lines += [f"  - {b}" for b in job.get("bullets", [])]
+    if res.get("education"):
+        lines.append("- *Education*")
+        lines += [f"  - {b}" for b in res["education"]]
+    lines += [
+        "",
         "- Public footprint: " + str(pub.get("footprint_level")),
         "- Private projects: " + ", ".join(pri.get("projects", [])),
         "- Sensitive access: " + ", ".join(pri.get("sensitive_access", [])),
         "- Behavior: security awareness " + str(beh.get("security_awareness"))
-        + "; traits: " + ", ".join(beh.get("traits", [])),
+        + f", p(click) {beh.get('p_click_simulated_phish')}; traits: " + ", ".join(beh.get("traits", [])),
     ]
     return "\n".join(lines)
 
@@ -66,24 +76,21 @@ def _example_email_md(e: dict) -> str:
         f"impersonating _{e['impersonated_role']}_\n\n"
         f"- From: `{e['sender_display']} <{e['sender_address']}>`\n"
         f"- Subject: **{e['subject']}**\n"
-        f"- Personalization used: {', '.join(e['personalization_fields'])}\n\n"
+        f"- Personalization used: {', '.join(map(str, e['personalization_fields']))}\n\n"
         "```\n" + e["body"].strip() + "\n```"
     )
 
 
-def build_report(data_dir, out_path, profile_stats, email_stats, run_meta,
+def build_report(data_dir, out_path, profile_stats, resume_st, email_stats, run_meta,
                  fig_rel="figures") -> Path:
     data_dir, out_path = Path(data_dir), Path(out_path)
     profiles = _join_profiles(data_dir)
     emails = read_jsonl(data_dir / FILES["emails_attack"])
-    orgs = read_jsonl(data_dir / FILES["orgs"])
 
-    # Pick diverse examples.
     ex_profiles, seen = [], set()
     for p in profiles.values():
-        key = p["core"]["target_role"]
-        if key not in seen:
-            seen.add(key)
+        if p["core"]["target_role"] not in seen:
+            seen.add(p["core"]["target_role"])
             ex_profiles.append(p)
         if len(ex_profiles) >= 3:
             break
@@ -98,11 +105,13 @@ def build_report(data_dir, out_path, profile_stats, email_stats, run_meta,
     def fig(name, caption):
         return f"![{caption}]({fig_rel}/{name})\n\n*{caption}*\n"
 
+    counts = run_meta["counts"]
+    lo, hi = resume_st["range"]
     md: list[str] = []
-    md.append("# Synthetic Spear-Phishing Corpus — Initial Run\n")
+    md.append("# Synthetic Spear-Phishing Corpus — v2 Run\n")
     md.append(
         f"_Generated {date.today().isoformat()} · backend: **{run_meta['backend']}** · "
-        f"seed model: `{run_meta['seed_model']}` · bulk model: `{run_meta['bulk_model']}` · "
+        f"model: `{run_meta.get('model') or '-'}` · population {run_meta['population_version']} · "
         f"prompt {run_meta['prompt_version']} · random seed {run_meta['seed']}_\n"
     )
     md.append(
@@ -113,95 +122,88 @@ def build_report(data_dir, out_path, profile_stats, email_stats, run_meta,
 
     md.append("## 1. Scope and method\n")
     md.append(
-        "This covers the profile-and-email **generator** only (the `Profiles.md` piece). "
-        "Two LLM roles are used: one LLM invents synthetic people and companies, a second "
-        "writes a spear email targeting each synthetic person.\n\n"
-        "**Two-stage, few-shot generation.** The first "
-        f"{run_meta['seed_count']} profiles and {run_meta['seed_count']} emails are written "
-        f"by the higher-capability model (`{run_meta['seed_model']}`) with no exemplars and "
-        f"saved to `seeds/`. The remaining items are written by `{run_meta['bulk_model']}` "
-        "conditioned on those seeds as few-shot exemplars.\n\n"
-        "**MVP note.** This run was produced with the offline composing backend "
-        f"(`{run_meta['backend']}`): no API key was used (per the stated trajectory, the API "
-        "call is the next step). The prompts, two-stage structure, schema, database, and "
-        "analysis are the same ones the API path uses; switching the backend to "
-        "`AnthropicBackend` makes the two passes real without other changes. In this run the "
-        "full profile is given to the email generator (no context ablation yet).\n"
+        "1. **Sampler** (`src/population.py`): every person's industry, employer size, occupation, age, sex, "
+        "education, school, tenure, career stage, prior employers, online presence, email workload and phishing "
+        "susceptibility are drawn from the sourced distributions in `config/empirical.py`. The sampled population "
+        "is checked against the sources in `validation.md`.\n"
+        "2. **Narrative** (`src/prompts_v2.py`, `src/profile_v2.py`): the model receives the fixed spec and writes "
+        f"only text: a resume of {lo}–{hi} words with current-job, prior-job and education sections in which "
+        "every bullet carries a numeric performance metric, prior job titles, majors, social handles, posts, "
+        "projects, private details, access, traits and response tendencies. Output that violates the spec or the "
+        "resume rules is re-requested with the violations listed.\n"
+        "3. **Spear email** (`src/emails_v2.py`): the model receives the full merged profile and the employer and "
+        "writes one spear email; the sender and every link must be under `.example`.\n"
     )
-    md.append("**Record files** (one SQLite table each, linked by `profile_id` / `org_id`):\n")
-    md.append(_table(["file", "records"],
-              [[FILES[k], run_meta["counts"].get(k, "-")] for k in FILES]) + "\n")
+    md.append("**Record files** (one SQLite table each in `spear.sqlite`, linked by `profile_id` / `org_id`):\n")
+    md.append(_table(["file", "records"], [[FILES[k], counts.get(k, "-")] for k in FILES]) + "\n")
+    md.append(_table(["validation", "count"], [
+        ["profiles kept with narrative issues", len(run_meta.get("narrative_issues", []))],
+        ["emails kept with issues", len(run_meta.get("email_issues", []))],
+    ]) + "\n")
 
     md.append("## 2. Who was generated\n")
-    md.append(f"{run_meta['counts'].get('core')} profiles across "
-              f"{run_meta['counts'].get('orgs')} synthetic companies.\n")
+    md.append(f"{counts.get('core')} profiles across {counts.get('orgs')} synthetic companies.\n")
     md.append(fig("profiles_by_industry.png", "Profiles by industry"))
     md.append(_counts_table(profile_stats["industry"], "industry") + "\n")
     md.append(fig("profiles_by_career_stage.png", "Profiles by career stage"))
     md.append(_counts_table(profile_stats["career_stage"], "career stage") + "\n")
-    md.append(fig("profiles_by_company_size.png", "Profiles by company size"))
-    md.append(_counts_table(profile_stats["company_size"], "company size") + "\n")
+    md.append(fig("profiles_by_company_size.png", "Profiles by employer size"))
+    md.append(_counts_table(profile_stats["company_size"], "employees") + "\n")
     md.append(fig("profiles_by_target_role.png", "Profiles by target role"))
     md.append(_counts_table(profile_stats["target_role"], "target role") + "\n")
     md.append("### Companies\n")
     md.append(fig("orgs_by_industry.png", "Companies by industry"))
     md.append(fig("orgs_by_size.png", "Companies by size"))
 
-    md.append("## 3. Example profiles\n")
+    md.append("## 3. Resumes\n")
+    if resume_st["n"]:
+        md.append(fig("resume_word_count.png", "Resume length per profile"))
+    md.append(_table(["metric", "value"], [
+        ["profiles", resume_st["n"]],
+        ["words per resume (min / median / max)",
+         f"{resume_st['min_words']} / {resume_st['median_words']} / {resume_st['max_words']}"],
+        [f"resumes within {lo}–{hi} words", f"{resume_st['in_range']} / {resume_st['n']}"],
+        ["bullets with a numeric metric", f"{resume_st['bullets_with_metric']} / {resume_st['bullets']}"],
+        ["distinct bullets", f"{resume_st['distinct_bullets']} / {resume_st['bullets']}"],
+    ]) + "\n")
+
+    md.append("## 4. Example profiles\n")
     for p in ex_profiles:
         md.append(_example_profile_md(p) + "\n")
 
-    md.append("## 4. Example spear emails\n")
+    md.append("## 5. Example spear emails\n")
+    if not ex_emails:
+        md.append("No emails were generated in this run.\n")
     for e in ex_emails:
         md.append(_example_email_md(e) + "\n")
 
-    md.append("## 5. Email detectability pass\n")
-    md.append(
-        "Each email is scored on features phishing detectors commonly key on, and the "
-        "corpus is measured for template repetition. Figures and figures only; numbers are "
-        "observations.\n"
-    )
-    md.append(fig("email_scenarios.png", "Spear-email scenarios"))
-    md.append(fig("email_urgency.png", "Email urgency"))
-    md.append(fig("email_feature_prevalence.png", "Detector-relevant feature prevalence"))
-    md.append(fig("email_detectability_score.png", "Heuristic detectability score per email"))
-    md.append(_table(["metric", "value"], [
-        ["emails", email_stats["n"]],
-        ["mean heuristic detectability (0–1)", email_stats["mean_detectability"]],
-        ["distinct email-body signatures", f"{email_stats['distinct_body_signatures']} / {email_stats['n']}"],
-        ["corpus type–token ratio", email_stats["corpus_type_token_ratio"]],
-    ]) + "\n")
+    if email_stats["n"]:
+        md.append("## 6. Email detectability pass\n")
+        md.append(
+            "Each email is scored on features phishing detectors commonly key on, and the "
+            "corpus is measured for template repetition. The numbers are observations.\n"
+        )
+        md.append(fig("email_scenarios.png", "Spear-email scenarios"))
+        md.append(fig("email_urgency.png", "Email urgency"))
+        md.append(fig("email_feature_prevalence.png", "Detector-relevant feature prevalence"))
+        md.append(fig("email_detectability_score.png", "Heuristic detectability score per email"))
+        md.append(_table(["metric", "value"], [
+            ["emails", email_stats["n"]],
+            ["mean heuristic detectability (0–1)", email_stats["mean_detectability"]],
+            ["distinct email-body signatures", f"{email_stats['distinct_body_signatures']} / {email_stats['n']}"],
+            ["corpus type–token ratio", email_stats["corpus_type_token_ratio"]],
+        ] + [[f"{k.replace('_', ' ')} (% of emails)", v]
+             for k, v in email_stats["feature_prevalence_pct"].items()]) + "\n")
 
-    md.append("## 6. Observations\n")
-    mis = email_stats["feature_prevalence_pct"].get("sender_domain_mismatch", 0)
-    md.append(
-        f"- The sampled target distribution is non-uniform by design (see §2): finance, "
-        f"tech, and executive/finance roles are over-represented relative to a flat prior, "
-        f"matching the weighting declared in `config/dimensions.py`.\n"
-        f"- Sender-domain mismatch appears in {mis}% of emails — in this run it is universal "
-        f"because every sender address is a synthetic look-alike cousin of the company "
-        f"`.example` domain, so it is a trivially separable signal as generated.\n"
-        f"- Body-template repetition is high: {email_stats['distinct_body_signatures']} "
-        f"distinct body signatures across {email_stats['n']} emails and a corpus type–token "
-        f"ratio of {email_stats['corpus_type_token_ratio']}. The MVP composing backend draws "
-        f"from a finite template pool, so the emails cluster into few lexical shapes — i.e. "
-        f"they are quickly identifiable by n-gram repetition, consistent with the stated "
-        f"hypothesis for this stub.\n"
-        f"- These repetition and mismatch signals are properties of the offline backend. The "
-        f"next step in the stated trajectory (real `{run_meta['bulk_model']}` generation, then "
-        f"selective context removal) is what tests whether LLM-written emails remain this "
-        f"separable; the same analysis code applies unchanged.\n"
-    )
+    if run_meta["backend"] == "local":
+        md.append("> This run used the offline `local` backend: the resume, post and email text is composed from "
+                  "the fixed fragments in `src/pools.py`, not written by a model.\n")
 
-    md.append("## Appendix — reproducing / switching to the API\n")
+    md.append("## Appendix — reproducing\n")
     md.append(
         "```bash\n"
-        "# offline run (no key), as used here:\n"
-        "python scripts/run_initial.py --profiles 100 --emails 100 --seed 7\n\n"
-        "# real API run (Sonnet seeds + Haiku bulk): install the SDK and set credentials,\n"
-        "# then pass --backend anthropic\n"
-        "pip install anthropic\n"
-        "python scripts/run_initial.py --profiles 100 --emails 100 --backend anthropic\n"
+        f"python scripts/run_v2.py --profiles {run_meta['profiles']} --emails {run_meta['emails_requested']} "
+        f"--backend {run_meta['backend']} --seed {run_meta['seed']} --out {data_dir}\n"
         "```\n"
     )
 

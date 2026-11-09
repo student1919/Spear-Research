@@ -1,35 +1,28 @@
 """Load the generated JSONL files into a SQLite database.
 
-One table per record type (Profiles.md), linked by profile_id / org_id. List and
-dict fields are stored as JSON text so the files remain the source of truth and
-the DB stays queryable.
+One table per record type (Profiles.md), linked by profile_id / org_id. Columns are
+taken from the dataclasses in schema.py, so the DB always matches the written records.
+List and dict fields are stored as JSON text so the files remain the source of truth
+and the DB stays queryable.
 """
 
 from __future__ import annotations
 
 import json
 import sqlite3
+from dataclasses import fields
 from pathlib import Path
 
-from .schema import FILES, read_jsonl
+from .schema import (FILES, AttackEmail, Org, ProfileBehavior, ProfileCore, ProfilePrivate, ProfilePublic,
+                     read_jsonl)
 
 TABLES = {
-    "orgs": ("org_id", ["name", "domain", "industry", "size", "headcount",
-                        "hq_city", "founded", "org_chart", "synthetic"]),
-    "core": ("profile_id", ["org_id", "full_name", "email", "industry",
-                            "career_stage", "target_role", "title", "location"]),
-    "public": ("profile_id", ["resume_bullets", "social_presence",
-                             "footprint_level", "posts", "personal_website"]),
-    "private": ("profile_id", ["projects", "colleagues", "real_details",
-                              "sensitive_access"]),
-    "behavior": ("profile_id", ["traits", "security_awareness",
-                               "response_tendencies", "busy_level"]),
-    "emails_attack": ("email_id", ["profile_id", "org_id", "scenario", "pretext",
-                                   "impersonated_role", "sender_display",
-                                   "sender_address", "subject", "body",
-                                   "call_to_action", "urgency",
-                                   "personalization_fields", "generator",
-                                   "synthetic"]),
+    "orgs": ("org_id", Org),
+    "core": ("profile_id", ProfileCore),
+    "public": ("profile_id", ProfilePublic),
+    "private": ("profile_id", ProfilePrivate),
+    "behavior": ("profile_id", ProfileBehavior),
+    "emails_attack": ("email_id", AttackEmail),
 }
 
 
@@ -44,9 +37,10 @@ def build(data_dir: str | Path, db_path: str | Path) -> dict[str, int]:
     con = sqlite3.connect(db_path)
     counts: dict[str, int] = {}
     try:
-        for table, (pk, cols) in TABLES.items():
+        for table, (pk, cls) in TABLES.items():
             rows = read_jsonl(data_dir / FILES[table])
-            col_defs = ", ".join([f'"{pk}" TEXT PRIMARY KEY'] + [f'"{c}" TEXT' for c in cols])
+            cols = [f.name for f in fields(cls) if f.name != pk]
+            col_defs = ", ".join([f'"{pk}" TEXT PRIMARY KEY'] + [f'"{c}"' for c in cols])
             con.execute(f'CREATE TABLE "{table}" ({col_defs})')
             allcols = [pk] + cols
             con.executemany(

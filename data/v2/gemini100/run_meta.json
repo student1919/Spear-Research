@@ -1,0 +1,194 @@
+{
+ "population_version": "v2",
+ "prompt_version": "v2.2",
+ "backend": "gemini",
+ "model": "gemini-3.5-flash-lite",
+ "last_usage": {
+  "model": "gemini-3.5-flash-lite",
+  "input_tokens": 1878,
+  "output_tokens": 1268
+ },
+ "seed": 21,
+ "profiles": 100,
+ "emails_requested": 0,
+ "counts": {
+  "orgs": 1,
+  "core": 100,
+  "public": 100,
+  "private": 100,
+  "behavior": 100,
+  "emails_attack": 0
+ },
+ "narrative_issues": [
+  {
+   "profile": 8,
+   "errors": [
+    "the resume has 397 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 16 bullets now average 25 words and need to average about 31 (add about 103 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 11,
+   "errors": [
+    "the resume has 415 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 14 bullets now average 30 words and need to average about 36 (add about 85 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 12,
+   "errors": [
+    "the resume has 557 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 16 bullets now average 35 words and need to average about 31 (cut about 57 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 17,
+   "errors": [
+    "the resume has 442 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 58 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 26,
+   "errors": [
+    "the resume has 417 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 14 bullets now average 30 words and need to average about 36 (add about 83 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 28,
+   "errors": [
+    "the resume has 427 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 33 words and need to average about 38 (add about 73 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 32,
+   "errors": [
+    "the resume has 411 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 32 words and need to average about 38 (add about 89 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 34,
+   "errors": [
+    "the resume has 416 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 32 words and need to average about 38 (add about 84 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 47,
+   "errors": [
+    "the resume has 433 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 14 bullets now average 31 words and need to average about 36 (add about 67 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 55,
+   "errors": [
+    "the resume has 423 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 33 words and need to average about 38 (add about 77 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 56,
+   "errors": [
+    "the resume has 362 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 28 words and need to average about 38 (add about 138 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 60,
+   "errors": [
+    "the resume has 343 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 26 words and need to average about 38 (add about 157 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 61,
+   "errors": [
+    "the resume has 444 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 56 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 63,
+   "errors": [
+    "the resume has 388 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 23 words and need to average about 29 (add about 112 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 68,
+   "errors": [
+    "the resume has 396 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 23 words and need to average about 29 (add about 104 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 71,
+   "errors": [
+    "the resume has 416 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 32 words and need to average about 38 (add about 84 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 72,
+   "errors": [
+    "the resume has 409 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 31 words and need to average about 38 (add about 91 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 73,
+   "errors": [
+    "resume.education bullet must mention University of Montevallo",
+    "the resume has 437 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 63 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 76,
+   "errors": [
+    "the resume has 437 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 63 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 81,
+   "errors": [
+    "the resume has 434 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 66 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 89,
+   "errors": [
+    "the resume has 446 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 26 words and need to average about 29 (add about 54 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 90,
+   "errors": [
+    "the resume has 407 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 31 words and need to average about 38 (add about 93 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 93,
+   "errors": [
+    "the resume has 597 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 17 bullets now average 35 words and need to average about 29 (cut about 97 words overall)"
+   ],
+   "skipped": false
+  },
+  {
+   "profile": 96,
+   "errors": [
+    "the resume has 411 words in total; it must have 450-550. Keep the same bullets but rewrite each one longer: 13 bullets now average 32 words and need to average about 38 (add about 89 words overall)"
+   ],
+   "skipped": false
+  }
+ ],
+ "email_issues": []
+}
